@@ -436,14 +436,14 @@
 // };
 
 // export default App;
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import CourseNavLinks from "./CourseNavLinks";
 import About from "./About";
 import Contact from "./Contact";
 import Services from "./Services";
-// import LandingPage from "./LandingPage"; // Uncomment when you send this file
+// import LandingPage from "./LandingPage"; // Uncomment when you add this file
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -474,9 +474,9 @@ const App = () => {
 
   const navLinks = [
     { to: "/", label: "Home" },
-    { to: "/About", label: "About" },
-    { to: "/Contact", label: "Contact" },
-    { to: "/Services", label: "Services" },
+    { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
+    { to: "/services", label: "Services" },
   ];
 
   const socialIcons = [
@@ -488,29 +488,36 @@ const App = () => {
     { icon: "fa-github", link: "https://www.github.com", name: "GitHub" },
   ];
 
+  // Tooltip opacity handle karne ke liye state
+  const [tooltipIndex, setTooltipIndex] = useState(null);
+
   return (
     <Router>
       <div>
         {/* Header */}
-        <header style={{
-          backgroundColor: "#343A45",
-          color: "#ffc107",
-          padding: "10px 0",
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          width: "100%",
-          height: "6rem",
-        }}>
-          <div style={{
-            width: "80%",
-            margin: "0 auto",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}>
+        <header
+          style={{
+            backgroundColor: "#343A45",
+            color: "#ffc107",
+            padding: "10px 0",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 100,
+            width: "100%",
+            height: "6rem",
+          }}
+        >
+          <div
+            style={{
+              width: "80%",
+              margin: "0 auto",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+            }}
+          >
             <div style={{ display: "flex", alignItems: "center" }}>
               <span style={{ color: "#ffc107", fontSize: "24px" }}>
                 <i className="fa-solid fa-code"></i>
@@ -530,28 +537,27 @@ const App = () => {
                 fontSize: "24px",
                 cursor: "pointer",
               }}
+              aria-label="Toggle Sidebar"
             >
               <i className="fa-solid fa-bars"></i>
             </button>
           </div>
 
           {/* Course Navigation */}
-          <nav style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: "10px",
-          }}>
+          <nav
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginTop: "10px",
+            }}
+          >
             <CourseNavLinks />
           </nav>
         </header>
 
         {/* Sidebar */}
-        <motion.div
-          animate={sidebarOpen ? "open" : "closed"}
-          variants={sidebarVariants}
-          style={sidebarStyle}
-        >
+        <motion.div animate={sidebarOpen ? "open" : "closed"} variants={sidebarVariants} style={sidebarStyle}>
           <button
             onClick={toggleSidebar}
             style={{
@@ -566,6 +572,7 @@ const App = () => {
               alignItems: "center",
               gap: "10px",
             }}
+            aria-label="Close Sidebar"
           >
             <i className="fa-solid fa-code"></i>
             <i className="fa-solid fa-xmark" style={{ marginLeft: "11rem" }}></i>
@@ -576,7 +583,11 @@ const App = () => {
               <li key={idx} style={{ margin: "15px 0", fontSize: "18px" }}>
                 <NavLink
                   to={link.to}
-                  style={{ textDecoration: "none", color: "#ffc107" }}
+                  style={({ isActive }) => ({
+                    textDecoration: "none",
+                    color: isActive ? "#ffca28" : "#ffc107",
+                    fontWeight: isActive ? "bold" : "normal",
+                  })}
                   onClick={() => setSidebarOpen(false)}
                 >
                   {link.label}
@@ -591,17 +602,23 @@ const App = () => {
             <p>contact@glintsite.com</p>
             <p>info@glintsite.com</p>
             <p style={{ color: "white" }}>Call Us At</p>
-            <p><span style={{ color: "white" }}>Phone:</span> (+63) 555 1212</p>
-            <p><span style={{ color: "white" }}>Mobile:</span> (+63) 555 0100</p>
+            <p>
+              <span style={{ color: "white" }}>Phone:</span> (+63) 555 1212
+            </p>
+            <p>
+              <span style={{ color: "white" }}>Mobile:</span> (+63) 555 0100
+            </p>
           </div>
 
           {/* Social Icons */}
-          <div style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "15px",
-            marginBottom: "20px",
-          }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "15px",
+              marginBottom: "20px",
+            }}
+          >
             {socialIcons.map((social, index) => (
               <div key={index} style={{ position: "relative" }}>
                 <a
@@ -609,19 +626,13 @@ const App = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{ color: "#ffc107", fontSize: "20px" }}
-                  onMouseEnter={() => {
-                    const tooltip = document.getElementById(`tooltip-${index}`);
-                    if (tooltip) tooltip.style.opacity = 1;
-                  }}
-                  onMouseLeave={() => {
-                    const tooltip = document.getElementById(`tooltip-${index}`);
-                    if (tooltip) tooltip.style.opacity = 0;
-                  }}
+                  onMouseEnter={() => setTooltipIndex(index)}
+                  onMouseLeave={() => setTooltipIndex(null)}
+                  aria-label={social.name}
                 >
                   <i className={`fa-brands ${social.icon}`}></i>
                 </a>
                 <span
-                  id={`tooltip-${index}`}
                   style={{
                     position: "absolute",
                     bottom: "-25px",
@@ -632,8 +643,10 @@ const App = () => {
                     padding: "3px 7px",
                     borderRadius: "5px",
                     fontSize: "12px",
-                    opacity: 0,
+                    opacity: tooltipIndex === index ? 1 : 0,
                     transition: "opacity 0.3s ease",
+                    pointerEvents: "none",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {social.name}
@@ -647,10 +660,10 @@ const App = () => {
         <main style={{ paddingTop: "6rem" }}>
           <Routes>
             <Route path="/" element={<div>Welcome to LearnCodeEra</div>} />
-            {/* <Route path="/" element={<LandingPage />} /> */} {/* Uncomment when you add LandingPage */}
-            <Route path="/About" element={<About />} />
-            <Route path="/Contact" element={<Contact />} />
-            <Route path="/Services" element={<Services />} />
+            {/* <Route path="/" element={<LandingPage />} /> */}
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/services" element={<Services />} />
           </Routes>
         </main>
       </div>
