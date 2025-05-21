@@ -443,7 +443,7 @@ import CourseNavLinks from "./CourseNavLinks";
 import About from "./About";
 import Contact from "./Contact";
 import Services from "./Services";
-// import LandingPage from "./LandingPage"; // Uncomment when you add this file
+import LandingPage from "./LandingPage"; // Uncomment when you add this file
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
